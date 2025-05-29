@@ -1,0 +1,2251 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0, minimum-scale=1.0">
+    <title>🐾 NEKOPON Quiz 🐾</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="problems.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka+One:wght@400&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700&display=swap');
+
+        :root {
+            --primary-orange: #d2691e;
+            --primary-coral: #ff7f50;
+            --primary-brown: #8b4513;
+            --accent-pink: #ff69b4;
+            --accent-gold: #ffd700;
+            --accent-cyan: #00ced1;
+            --bg-cream: #faf8f5;
+            --bg-white: #ffffff;
+            --text-brown: #8b4513;
+            --text-orange: #d2691e;
+            --border-light: #f4e4bc;
+            --shadow-warm: rgba(139,69,19,0.15);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* ユーザー選択を部分的に無効化（入力要素は除外） */
+        body, div, span, h1, h2, h3, h4, h5, h6, p {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            -webkit-touch-callout: none;
+        }
+
+        /* ボタンとインタラクティブ要素は選択可能に */
+        button, input, textarea, select {
+            -webkit-user-select: auto;
+            -moz-user-select: auto;
+            -ms-user-select: auto;
+            user-select: auto;
+        }
+
+        body {
+            font-family: 'M PLUS Rounded 1c', sans-serif;
+            background: #faf8f5; /* 単色背景に変更 */
+            min-height: 100vh;
+            touch-action: pan-y pinch-zoom;
+            color: var(--text-brown);
+            font-weight: 700;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* タイトルスタイル - フォントサイズを小さく */
+        .game-title {
+            font-family: 'Fredoka One', cursive;
+            font-weight: 400;
+            font-size: clamp(1.2rem, 4vw, 2rem); /* フォントサイズを小さく */
+            color: var(--primary-orange);
+            text-align: center;
+            letter-spacing: 1px;
+            margin-bottom: 1rem;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+            position: relative;
+        }
+
+        .game-title:hover {
+            transform: scale(1.02); /* 控えめなホバー効果 */
+        }
+
+        .game-title.title-bounce {
+            animation: title-gentle-bounce 0.6s ease-out;
+        }
+
+        @keyframes title-gentle-bounce {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        /* 猫アイコン */
+        .cat-icon {
+            display: inline-block;
+            cursor: pointer;
+            font-size: 1em;
+            margin: 0 8px;
+            transition: transform 0.2s ease-out;
+        }
+
+        .cat-icon:hover {
+            transform: scale(1.1);
+        }
+
+        .cat-icon.bounce {
+            animation: cat-gentle-bounce 0.5s ease-out;
+        }
+
+        @keyframes cat-gentle-bounce {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+
+        /* コンテナ */
+        .container-spacing {
+            margin: 0 auto;
+            max-width: 95%;
+            width: 100%;
+        }
+
+        @media (min-width: 640px) {
+            .container-spacing { max-width: 500px; }
+        }
+        @media (min-width: 768px) {
+            .container-spacing { max-width: 600px; }
+        }
+        @media (min-width: 1024px) {
+            .container-spacing { max-width: 700px; }
+        }
+
+        /* カード */
+        .clean-card {
+            background: var(--bg-white);
+            border: 2px solid var(--border-light);
+            border-radius: 20px;
+            box-shadow: 0 4px 15px var(--shadow-warm);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* ボタン */
+        .clean-button {
+            background: linear-gradient(145deg, var(--primary-orange), var(--primary-coral));
+            border: none;
+            color: white;
+            font-weight: 700;
+            border-radius: 15px;
+            transition: all 0.2s ease;
+            box-shadow: 0 3px 10px rgba(210,105,30,0.2);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            font-family: 'M PLUS Rounded 1c', sans-serif;
+            touch-action: manipulation;
+        }
+
+        .clean-button:hover {
+            transform: scale(1.02);
+            box-shadow: 0 4px 12px rgba(210,105,30,0.3);
+        }
+
+        .clean-button:active {
+            transform: scale(0.98);
+        }
+
+        /* 生き物らしいボタンアニメーション */
+        .organic-tap {
+            animation: organic-button-tap 0.4s ease-out !important;
+        }
+
+        @keyframes organic-button-tap {
+            0% { transform: scale(1); }
+            25% { transform: scale(1.1); }
+            50% { transform: scale(0.95); }
+            75% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        /* 教科ボタン */
+        .subject-btn {
+            background: var(--bg-white);
+            border: 2px solid var(--border-light);
+            border-radius: 15px;
+            color: var(--text-brown);
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
+            padding: 1.5rem 1rem;
+            min-height: 100px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 8px var(--shadow-warm);
+            cursor: pointer;
+            touch-action: manipulation;
+        }
+
+        .subject-btn:hover {
+            border-color: var(--primary-orange);
+            transform: scale(1.02);
+            box-shadow: 0 4px 12px rgba(210,105,30,0.2);
+        }
+
+        .subject-btn.active {
+            background: #fff0e6;
+            border-color: var(--primary-coral);
+            color: var(--primary-orange);
+            transform: scale(1.02);
+        }
+
+        /* 生き物らしい教科ボタンアニメーション */
+        .subject-btn.organic-tap {
+            animation: subject-organic-tap 0.5s ease-out !important;
+        }
+
+        @keyframes subject-organic-tap {
+            0% { transform: scale(1); }
+            20% { transform: scale(1.15); }
+            40% { transform: scale(0.9); }
+            60% { transform: scale(1.1); }
+            80% { transform: scale(0.95); }
+            100% { transform: scale(1); }
+        }
+
+        /* アイコン */
+        .subject-icon {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            transition: transform 0.2s ease;
+        }
+
+        .subject-btn:hover .subject-icon {
+            transform: scale(1.1);
+        }
+
+        .subject-name {
+            font-size: 1rem;
+            font-weight: 700;
+            transition: all 0.2s ease;
+        }
+
+        /* カテゴリボタン */
+        .category-btn {
+            background: var(--bg-white);
+            border: 2px solid var(--border-light);
+            border-radius: 12px;
+            color: var(--text-brown);
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
+            padding: 1rem 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            min-height: 70px;
+            box-shadow: 0 2px 6px var(--shadow-warm);
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            touch-action: manipulation;
+        }
+
+        .category-btn:hover {
+            border-color: var(--primary-orange);
+            transform: scale(1.02);
+            box-shadow: 0 3px 8px rgba(210,105,30,0.15);
+        }
+
+        .category-btn.active {
+            background: #ffe4d1;
+            border-color: var(--primary-coral);
+            color: var(--primary-orange);
+            transform: scale(1.02);
+        }
+
+        /* 生き物らしいカテゴリボタンアニメーション */
+        .category-btn.organic-tap {
+            animation: category-organic-tap 0.3s ease-out !important;
+        }
+
+        @keyframes category-organic-tap {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.08); }
+            100% { transform: scale(1); }
+        }
+
+        /* クイズオプション */
+        .quiz-option {
+            background: var(--bg-white);
+            border: 2px solid var(--border-light);
+            color: var(--text-brown);
+            border-radius: 12px;
+            padding: 1rem 1.25rem;
+            transition: all 0.2s ease;
+            font-weight: 600;
+            font-size: 1rem;
+            position: relative;
+            box-shadow: 0 2px 8px var(--shadow-warm);
+            cursor: pointer;
+            overflow: hidden;
+            touch-action: manipulation;
+        }
+
+        .quiz-option:hover {
+            border-color: var(--primary-orange);
+            transform: scale(1.02);
+            box-shadow: 0 3px 10px rgba(210,105,30,0.2);
+        }
+
+        .quiz-option span {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* 生き物らしいクイズオプションアニメーション */
+        .quiz-option.organic-tap {
+            animation: quiz-option-organic-tap 0.3s ease-out !important;
+        }
+
+        @keyframes quiz-option-organic-tap {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        /* モーダル */
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(139,69,19,0.4);
+            align-items: flex-start;
+            justify-content: center;
+            z-index: 1000;
+            padding: 1rem;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            touch-action: pan-y;
+        }
+
+        .modal.show {
+            display: flex;
+            animation: modal-gentle-enter 0.3s ease-out;
+        }
+
+        @keyframes modal-gentle-enter {
+            0% { opacity: 0; transform: scale(0.95); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+        /* モーダル内のカードをスクロール対応に */
+        .modal .clean-card {
+            width: 100%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            margin: auto;
+            touch-action: pan-y;
+        }
+
+        /* カテゴリコンテナのスクロール対応 */
+        .modal .grid {
+            max-height: 60vh;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            padding-right: 4px;
+        }
+
+        /* ステータス表示 */
+        .stats-display {
+            background: #fff8f0;
+            border: 2px solid var(--border-light);
+            border-radius: 15px;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 3px 10px var(--shadow-warm);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* スコア項目 */
+        .score-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-brown);
+            transition: all 0.2s ease;
+            cursor: pointer;
+            position: relative;
+            touch-action: manipulation;
+        }
+
+        .score-value:hover {
+            color: var(--primary-orange);
+            transform: scale(1.05);
+        }
+
+        /* レベル・バッジシステム - ライト効果削除 */
+        .level-badge {
+            display: inline-block;
+            background: linear-gradient(145deg, var(--accent-gold), #ffb347);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 15px;
+            font-weight: 700;
+            margin: 0.25rem;
+            box-shadow: 0 2px 6px rgba(255,215,0,0.2);
+            cursor: pointer;
+            touch-action: manipulation;
+            transition: transform 0.2s ease;
+        }
+
+        .level-badge:hover {
+            transform: scale(1.05);
+        }
+
+        .level-badge.organic-tap {
+            animation: badge-organic-tap 0.3s ease-out !important;
+        }
+
+        @keyframes badge-organic-tap {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        /* パーティクル */
+        .particle {
+            position: absolute;
+            pointer-events: none;
+            font-weight: 600;
+            z-index: 100;
+            font-size: 1.2rem;
+            animation: particle-gentle 1.5s ease-out forwards;
+        }
+
+        @keyframes particle-gentle {
+            0% {
+                transform: translateY(0) scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-60px) scale(1.2);
+                opacity: 0;
+            }
+        }
+
+        /* 通知 */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--bg-white);
+            color: var(--text-brown);
+            padding: 1rem 1.5rem;
+            border-radius: 15px;
+            border: 2px solid var(--border-light);
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+            z-index: 1001;
+            box-shadow: 0 4px 15px var(--shadow-warm);
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        /* フローティングボタン */
+        .floating-button {
+            position: fixed;
+            bottom: 30px;
+            left: 30px;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(145deg, var(--primary-orange), var(--primary-coral));
+            border: none;
+            border-radius: 50%;
+            color: white;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(210,105,30,0.3);
+            transition: all 0.2s ease;
+            z-index: 1002;
+            cursor: pointer;
+            touch-action: manipulation;
+        }
+
+        .floating-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 15px rgba(210,105,30,0.4);
+        }
+
+        .floating-button.hidden {
+            display: none !important;
+        }
+
+        .floating-button.organic-tap {
+            animation: floating-organic-tap 0.4s ease-out !important;
+        }
+
+        @keyframes floating-organic-tap {
+            0% { transform: scale(1); }
+            25% { transform: scale(1.2); }
+            50% { transform: scale(0.9); }
+            75% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        /* モード選択ボタン */
+        .mode-btn {
+            background: var(--bg-white);
+            border: 2px solid var(--border-light);
+            border-radius: 10px;
+            color: var(--text-brown);
+            transition: all 0.2s ease;
+            padding: 0.75rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 6px var(--shadow-warm);
+            cursor: pointer;
+            touch-action: manipulation;
+        }
+
+        .mode-btn:hover {
+            border-color: var(--primary-orange);
+            transform: scale(1.02);
+        }
+
+        .mode-btn.active {
+            background: #ffe4d1;
+            border-color: var(--primary-coral);
+            color: var(--primary-orange);
+            transform: scale(1.02);
+        }
+
+        .mode-btn.organic-tap {
+            animation: mode-organic-tap 0.2s ease-out !important;
+        }
+
+        @keyframes mode-organic-tap {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        /* レスポンシブ */
+        @media (max-width: 640px) {
+            .game-title { font-size: clamp(1rem, 5vw, 1.5rem); }
+            .cat-icon { font-size: 0.9em; margin: 0 6px; }
+            .subject-btn { padding: 1rem 0.75rem; min-height: 80px; }
+            .category-btn { padding: 0.75rem 0.5rem; min-height: 60px; font-size: 0.8rem; }
+            .quiz-option { padding: 0.75rem 1rem; font-size: 0.9rem; }
+            .floating-button { width: 50px; height: 50px; font-size: 1.2rem; bottom: 25px; left: 25px; }
+        }
+
+        /* クイズ説明エリア */
+        .quiz-explanation {
+            min-height: 100px;
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 1rem;
+            margin-top: 1rem;
+            border: 2px solid var(--border-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            overflow-y: auto;
+            box-sizing: border-box;
+            font-size: 1rem;
+            line-height: 1.4;
+            transition: all 0.2s ease;
+        }
+
+        .quiz-explanation.has-content {
+            border-color: var(--primary-coral);
+            background: #fff0e6;
+        }
+
+        .back-button {
+            background: #f1f5f9;
+            border: 2px solid var(--border-light);
+            color: var(--text-brown);
+            border-radius: 12px;
+            padding: 0.75rem 1.25rem;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            font-size: 0.9rem;
+            cursor: pointer;
+            box-shadow: 0 2px 6px var(--shadow-warm);
+            touch-action: manipulation;
+        }
+
+        .back-button:hover {
+            background: #e2e8f0;
+            transform: scale(1.02);
+        }
+
+        .back-button.organic-tap {
+            animation: back-organic-tap 0.2s ease-out !important;
+        }
+
+        @keyframes back-organic-tap {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center pt-6 pb-12 gap-6 relative">
+    <!-- タイトル部分 -->
+    <div class="text-center mb-4">
+        <h1 class="game-title" id="mainTitle">
+            <span class="cat-icon" id="leftCat">🐱</span>
+            NEKOPON Quiz
+            <span class="cat-icon" id="rightCat">🐱</span>
+        </h1>
+        <div id="levelBadges" class="mt-2"></div>
+    </div>
+
+    <!-- 教科選択モーダル -->
+    <div id="mainSubjectModal" class="modal show">
+        <div class="clean-card p-6 container-spacing">
+            <div class="text-center mb-6">
+                <h2 class="text-xl font-bold mb-3 text-orange-700">
+                    📚 教科を選択してにゃ〜
+                </h2>
+                <p class="text-orange-600 text-sm">どの教科で遊ぶか選んでください♪</p>
+            </div>
+            <div class="grid grid-cols-3 gap-4 mb-6">
+                <button class="subject-btn" data-subject="social">
+                    <div class="subject-icon">🌍</div>
+                    <div class="subject-name">社会</div>
+                </button>
+                <button class="subject-btn" data-subject="science">
+                    <div class="subject-icon">🔬</div>
+                    <div class="subject-name">理科</div>
+                </button>
+                <button class="subject-btn" data-subject="english">
+                    <div class="subject-icon">📖</div>
+                    <div class="subject-name">英語</div>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 社会分野選択 -->
+    <div id="socialModal" class="modal">
+        <div class="clean-card p-6 container-spacing">
+            <div class="text-center mb-6">
+                <h2 class="text-xl font-bold mb-3 text-orange-700">
+                    🌍 社会の分野を選択
+                </h2>
+                <p class="text-orange-600 text-sm">どの分野で学習するか選んでください♪</p>
+            </div>
+            <div class="grid grid-cols-3 gap-4 mb-6">
+                <button class="subject-btn" data-category="geography">
+                    <div class="subject-icon">🗺️</div>
+                    <div class="subject-name">地理</div>
+                </button>
+                <button class="subject-btn" data-category="history">
+                    <div class="subject-icon">🏛️</div>
+                    <div class="subject-name">歴史</div>
+                </button>
+                <button class="subject-btn" data-category="civics">
+                    <div class="subject-icon">⚖️</div>
+                    <div class="subject-name">公民</div>
+                </button>
+            </div>
+            <div class="text-center">
+                <button class="back-button" onclick="goBackToMain()">
+                    ← 教科選択に戻る
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 理科分野選択 -->
+    <div id="scienceModal" class="modal">
+        <div class="clean-card p-6 container-spacing">
+            <div class="text-center mb-6">
+                <h2 class="text-xl font-bold mb-3 text-orange-700">
+                    🔬 理科の分野を選択
+                </h2>
+                <p class="text-orange-600 text-sm">どの分野で学習するか選んでください♪</p>
+            </div>
+            <div class="grid grid-cols-2 gap-4 mb-6">
+                <button class="subject-btn" data-category="chemistry">
+                    <div class="subject-icon">🧪</div>
+                    <div class="subject-name">化学</div>
+                </button>
+                <button class="subject-btn" data-category="biology">
+                    <div class="subject-icon">🧬</div>
+                    <div class="subject-name">生物</div>
+                </button>
+                <button class="subject-btn" data-category="physics">
+                    <div class="subject-icon">⚛️</div>
+                    <div class="subject-name">物理</div>
+                </button>
+                <button class="subject-btn" data-category="earth">
+                    <div class="subject-icon">🌍</div>
+                    <div class="subject-name">地学</div>
+                </button>
+            </div>
+            <div class="text-center">
+                <button class="back-button" onclick="goBackToMain()">
+                    ← 教科選択に戻る
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 英語分野選択 -->
+    <div id="englishModal" class="modal">
+        <div class="clean-card p-6 container-spacing">
+            <div class="text-center mb-6">
+                <h2 class="text-xl font-bold mb-3 text-orange-700">
+                    📖 英語の分野を選択
+                </h2>
+                <p class="text-orange-600 text-sm">どの分野で学習するか選んでください♪</p>
+            </div>
+            <div class="grid grid-cols-3 gap-4 mb-6">
+                <button class="subject-btn" data-category="english_words">
+                    <div class="subject-icon">📝</div>
+                    <div class="subject-name">英単語</div>
+                </button>
+                <button class="subject-btn" data-category="english_phrases">
+                    <div class="subject-icon">💬</div>
+                    <div class="subject-name">英熟語</div>
+                </button>
+                <button class="subject-btn" data-category="english_grammar">
+                    <div class="subject-icon">📘</div>
+                    <div class="subject-name">語形変化</div>
+                </button>
+            </div>
+            <div class="text-center">
+                <button class="back-button" onclick="goBackToMain()">
+                    ← 教科選択に戻る
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- カテゴリ選択モーダル（地理） -->
+    <div id="geographyModal" class="modal">
+        <div class="clean-card p-6 container-spacing">
+            <div class="text-center mb-4">
+                <h2 class="text-lg font-bold mb-3 text-orange-700">
+                    🗺️ 地理の単元選択
+                </h2>
+                <p class="text-orange-600 text-sm">学習する単元を選んでください♪<br>複数選択もできます！</p>
+            </div>
+            <div class="grid grid-cols-1 gap-2 mb-4" id="geographyCategories"></div>
+            <div class="text-center space-y-2">
+                <button id="startGeographyQuiz" class="clean-button px-6 py-3 text-sm" disabled>
+                    🎯 クイズ開始にゃ〜！
+                </button>
+                <br>
+                <button class="back-button" onclick="goBackToSocial()">
+                    ← 社会に戻る
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 他のカテゴリモーダルも同様に... -->
+    <!-- 歴史 -->
+    <div id="historyModal" class="modal">
+        <div class="clean-card p-6 container-spacing">
+            <div class="text-center mb-4">
+                <h2 class="text-lg font-bold mb-3 text-orange-700">
+                    🏛️ 歴史の単元選択
+                </h2>
+                <p class="text-orange-600 text-sm">学習する単元を選んでください♪<br>複数選択もできます！</p>
+            </div>
+            <div class="grid grid-cols-1 gap-2 mb-4" id="historyCategories"></div>
+            <div class="text-center space-y-2">
+                <button id="startHistoryQuiz" class="clean-button px-6 py-3 text-sm" disabled>
+                    🎯 クイズ開始にゃ〜！
+                </button>
+                <br>
+                <button class="back-button" onclick="goBackToSocial()">
+                    ← 社会に戻る
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 公民 -->
+    <div id="civicsModal" class="modal">
+        <div class="clean-card p-6 container-spacing">
+            <div class="text-center mb-4">
+                <h2 class="text-lg font-bold mb-3 text-orange-700">
+                    ⚖️ 公民の単元選択
+                </h2>
+                <p class="text-orange-600 text-sm">学習する単元を選んでください♪<br>複数選択もできます！</p>
+            </div>
+            <div class="grid grid-cols-1 gap-2 mb-4" id="civicsCategories"></div>
+            <div class="text-center space-y-2">
+                <button id="startCivicsQuiz" class="clean-button px-6 py-3 text-sm" disabled>
+                    🎯 クイズ開始にゃ〜！
+                </button>
+                <br>
+                <button class="back-button" onclick="goBackToSocial()">
+                    ← 社会に戻る
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 化学 -->
+    <div id="chemistryModal" class="modal">
+        <div class="clean-card p-6 container-spacing">
+            <div class="text-center mb-4">
+                <h2 class="text-lg font-bold mb-3 text-orange-700">
+                    🧪 化学の単元選択
+                </h2>
+                <p class="text-orange-600 text-sm">学習する単元を選んでください♪<br>複数選択もできます！</p>
+            </div>
+            <div class="grid grid-cols-1 gap-2 mb-4" id="chemistryCategories"></div>
+            <div class="text-center space-y-2">
+                <button id="startChemistryQuiz" class="clean-button px-6 py-3 text-sm" disabled>
+                    🎯 クイズ開始にゃ〜！
+                </button>
+                <br>
+                <button class="back-button" onclick="goBackToScience()">
+                    ← 理科に戻る
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 生物 -->
+    <div id="biologyModal" class="modal">
+        <div class="clean-card p-6 container-spacing">
+            <div class="text-center mb-4">
+                <h2 class="text-lg font-bold mb-3 text-orange-700">
+                    🧬 生物の単元選択
+                </h2>
+                <p class="text-orange-600 text-sm">学習する単元を選んでください♪<br>複数選択もできます！</p>
+            </div>
+            <div class="grid grid-cols-1 gap-2 mb-4" id="biologyCategories"></div>
+            <div class="text-center space-y-2">
+                <button id="startBiologyQuiz" class="clean-button px-6 py-3 text-sm" disabled>
+                    🎯 クイズ開始にゃ〜！
+                </button>
+                <br>
+                <button class="back-button" onclick="goBackToScience()">
+                    ← 理科に戻る
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 物理 -->
+    <div id="physicsModal" class="modal">
+        <div class="clean-card p-6 container-spacing">
+            <div class="text-center mb-4">
+                <h2 class="text-lg font-bold mb-3 text-orange-700">
+                    ⚛️ 物理の単元選択
+                </h2>
+                <p class="text-orange-600 text-sm">学習する単元を選んでください♪<br>複数選択もできます！</p>
+            </div>
+            <div class="grid grid-cols-1 gap-2 mb-4" id="physicsCategories"></div>
+            <div class="text-center space-y-2">
+                <button id="startPhysicsQuiz" class="clean-button px-6 py-3 text-sm" disabled>
+                    🎯 クイズ開始にゃ〜！
+                </button>
+                <br>
+                <button class="back-button" onclick="goBackToScience()">
+                    ← 理科に戻る
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 地学 -->
+    <div id="earthModal" class="modal">
+        <div class="clean-card p-6 container-spacing">
+            <div class="text-center mb-4">
+                <h2 class="text-lg font-bold mb-3 text-orange-700">
+                    🌍 地学の単元選択
+                </h2>
+                <p class="text-orange-600 text-sm">学習する単元を選んでください♪<br>複数選択もできます！</p>
+            </div>
+            <div class="grid grid-cols-1 gap-2 mb-4" id="earthCategories"></div>
+            <div class="text-center space-y-2">
+                <button id="startEarthQuiz" class="clean-button px-6 py-3 text-sm" disabled>
+                    🎯 クイズ開始にゃ〜！
+                </button>
+                <br>
+                <button class="back-button" onclick="goBackToScience()">
+                    ← 理科に戻る
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 英単語 -->
+    <div id="englishWordsModal" class="modal">
+        <div class="clean-card p-6 container-spacing">
+            <div class="text-center mb-4">
+                <h2 class="text-lg font-bold mb-3 text-orange-700">
+                    📝 英単語の単元選択
+                </h2>
+                <p class="text-orange-600 text-sm">学習する単元を選んでください♪<br>複数選択もできます！</p>
+            </div>
+            <div class="grid grid-cols-1 gap-2 mb-4" id="englishWordsCategories"></div>
+            <div class="text-center space-y-2">
+                <button id="startEnglishWordsQuiz" class="clean-button px-6 py-3 text-sm" disabled>
+                    🎯 クイズ開始にゃ〜！
+                </button>
+                <br>
+                <button class="back-button" onclick="goBackToEnglish()">
+                    ← 英語に戻る
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 英熟語 -->
+    <div id="englishPhrasesModal" class="modal">
+        <div class="clean-card p-6 container-spacing">
+            <div class="text-center mb-4">
+                <h2 class="text-lg font-bold mb-3 text-orange-700">
+                    💬 英熟語の単元選択
+                </h2>
+                <p class="text-orange-600 text-sm">学習する単元を選んでください♪<br>複数選択もできます！</p>
+            </div>
+            <div class="grid grid-cols-1 gap-2 mb-4" id="englishPhrasesCategories"></div>
+            <div class="text-center space-y-2">
+                <button id="startEnglishPhrasesQuiz" class="clean-button px-6 py-3 text-sm" disabled>
+                    🎯 クイズ開始にゃ〜！
+                </button>
+                <br>
+                <button class="back-button" onclick="goBackToEnglish()">
+                    ← 英語に戻る
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 語形変化 -->
+    <div id="englishGrammarModal" class="modal">
+        <div class="clean-card p-6 container-spacing">
+            <div class="text-center mb-4">
+                <h2 class="text-lg font-bold mb-3 text-orange-700">
+                    📘 語形変化の単元選択
+                </h2>
+                <p class="text-orange-600 text-sm">学習する単元を選んでください♪<br>複数選択もできます！</p>
+            </div>
+            <div class="grid grid-cols-1 gap-2 mb-4" id="englishGrammarCategories"></div>
+            <div class="text-center space-y-2">
+                <button id="startEnglishGrammarQuiz" class="clean-button px-6 py-3 text-sm" disabled>
+                    🎯 クイズ開始にゃ〜！
+                </button>
+                <br>
+                <button class="back-button" onclick="goBackToEnglish()">
+                    ← 英語に戻る
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ゲーム画面 -->
+    <div id="gameScreen" class="hidden">
+        <div class="clean-card p-6 text-center container-spacing mb-6">
+            <h1 class="game-title">🐾 NEKOPON Quiz 🐾</h1>
+            <div id="currentCategory" class="text-lg font-bold text-orange-700 mb-4"></div>
+            
+            <div class="stats-display">
+                <div class="grid grid-cols-4 gap-4 text-center mb-4">
+                    <div>
+                        <div class="score-value" id="correctCount">0</div>
+                        <div class="text-xs text-orange-600">正解数</div>
+                    </div>
+                    <div>
+                        <div class="score-value" id="wrongCount">0</div>
+                        <div class="text-xs text-orange-600">不正解数</div>
+                    </div>
+                    <div>
+                        <div class="score-value" id="totalCount">0</div>
+                        <div class="text-xs text-orange-600">総問題数</div>
+                    </div>
+                    <div>
+                        <div class="score-value" id="comboCount">0</div>
+                        <div class="text-xs text-orange-600">連続正解</div>
+                    </div>
+                </div>
+                
+                <div class="h-px bg-orange-200 my-4"></div>
+                
+                <div class="text-center">
+                    <div class="text-sm font-bold text-orange-700 mb-3">📋 出題形式</div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <button id="randomModeBtn" class="mode-btn active" data-mode="random">
+                            🎲 ランダム
+                        </button>
+                        <button id="sequentialModeBtn" class="mode-btn" data-mode="sequential">
+                            📋 順番通り
+                        </button>
+                    </div>
+                    <div class="text-xs text-orange-600 mt-2" id="modeDescription">
+                        問題をランダムに出題します
+                    </div>
+                </div>
+            </div>
+            
+            <button id="startQuizButton" class="clean-button px-8 py-4 text-lg font-bold mt-6">
+                ✨ クイズ開始にゃ〜！ ✨
+            </button>
+        </div>
+    </div>
+
+    <!-- クイズモーダル -->
+    <div id="quizModal" class="modal">
+        <div class="clean-card p-6 w-full max-w-lg mx-4">
+            <div class="text-center mb-4">
+                <h2 class="font-bold text-xl text-orange-700">
+                    🐾 NEKOPON Quiz 🐾
+                </h2>
+            </div>
+            <div class="space-y-4">
+                <p id="quizQ" class="text-lg font-bold text-center text-orange-800 leading-relaxed"></p>
+                <div id="quizOptions" class="space-y-3"></div>
+                <div id="quizExplanation" class="quiz-explanation">
+                    <p id="quizMsg" class="font-bold text-center text-lg"></p>
+                </div>
+                <div class="flex gap-3">
+                    <button id="quizNext" class="flex-1 clean-button py-3 text-sm">
+                        🌟 次の問題にゃ〜
+                    </button>
+                    <button id="quizBack" class="flex-1 back-button py-3 text-sm">
+                        🏠 戻るにゃ〜
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- フローティングボタン -->
+    <button id="changeSubject" class="floating-button hidden">
+        📚
+    </button>
+
+    <!-- 通知 -->
+    <div id="notification" class="notification">
+        <div class="flex items-center gap-3">
+            <span class="text-2xl">🐱</span>
+            <div>
+                <div class="font-bold text-sm">NEKOPON Quiz</div>
+                <div id="notificationText" class="text-xs text-orange-600"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /* ----------------- NEKOPON風 効果音システム（軽量版） ----------------- */
+        class NekoponSoundSystem {
+            constructor() {
+                this.audioContext = null;
+                this.sounds = {};
+                this.initAudio();
+            }
+
+            initAudio() {
+                try {
+                    this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                } catch (e) {
+                    console.log('音声システムを初期化できませんでした');
+                }
+            }
+
+            // 基本音の生成（軽量版）
+            createTone(frequency, duration, volume = 0.2, type = 'sine') {
+                if (!this.audioContext) return;
+
+                const oscillator = this.audioContext.createOscillator();
+                const gainNode = this.audioContext.createGain();
+
+                oscillator.connect(gainNode);
+                gainNode.connect(this.audioContext.destination);
+
+                oscillator.frequency.setValueAtTime(frequency, this.audioContext.currentTime);
+                oscillator.type = type;
+
+                gainNode.gain.setValueAtTime(0, this.audioContext.currentTime);
+                gainNode.gain.linearRampToValueAtTime(volume, this.audioContext.currentTime + 0.01);
+                gainNode.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + duration);
+
+                oscillator.start(this.audioContext.currentTime);
+                oscillator.stop(this.audioContext.currentTime + duration);
+            }
+
+            // シンプルなクリック音
+            playClick() {
+                this.createTone(600, 0.1, 0.1, 'sine');
+            }
+
+            // 正解音（シンプル）
+            playCorrect() {
+                this.createTone(800, 0.2, 0.15);
+                setTimeout(() => this.createTone(1000, 0.2, 0.1), 100);
+            }
+
+            // 不正解音（優しく）
+            playWrong() {
+                this.createTone(300, 0.2, 0.1, 'triangle');
+            }
+
+            // その他の音も同様にシンプル化
+            playSubjectTap() {
+                this.createTone(700, 0.15, 0.12);
+            }
+
+            playCategoryTap() {
+                this.createTone(500, 0.1, 0.1);
+            }
+
+            playTitleBounce() {
+                this.createTone(800, 0.3, 0.15);
+            }
+
+            playCatBounce() {
+                this.createTone(700, 0.2, 0.1);
+            }
+        }
+
+        const nekoponSound = new NekoponSoundSystem();
+
+        /* ----------------- 音声発音システム（改良版） ----------------- */
+        function speakWord(wordToSpeak) {
+            if (!('speechSynthesis' in window) || !wordToSpeak) return;
+            
+            setTimeout(() => {
+                const utterance = new SpeechSynthesisUtterance(wordToSpeak);
+                const voices = speechSynthesis.getVoices();
+                let preferredVoice = voices.find(v => /en-(US|GB)/.test(v.lang) && (v.name.includes('Google') || v.localService || v.default));
+                if (!preferredVoice) preferredVoice = voices.find(v => /en-(US|GB)/.test(v.lang));
+               
+                utterance.voice = preferredVoice || voices.find(v => v.lang && v.lang.startsWith('en-')); 
+                utterance.lang = utterance.voice ? utterance.voice.lang : 'en-US';
+                utterance.rate = 0.9; 
+                utterance.pitch = 1;
+                speechSynthesis.cancel(); 
+                speechSynthesis.speak(utterance);
+            }, 100);
+        }
+
+        function isEnglishCategory() {
+            return selectedCategories.some(categoryId => 
+                categoryId.startsWith('words_') || categoryId.startsWith('phrases_') || categoryId.startsWith('grammar_')
+            );
+        }
+
+        /* ----------------- ゲーミフィケーション システム（簡素版） ----------------- */
+        class NekoponGameification {
+            constructor() {
+                this.playerLevel = 1;
+                this.totalExperience = 0;
+                this.achievements = new Set();
+                this.comboCount = 0;
+                this.maxCombo = 0;
+            }
+
+            // 正解時の処理
+            onCorrectAnswer() {
+                this.comboCount++;
+                this.maxCombo = Math.max(this.maxCombo, this.comboCount);
+                this.totalExperience += 10;
+
+                // レベルアップ判定
+                const newLevel = Math.floor(this.totalExperience / 100) + 1;
+                if (newLevel > this.playerLevel) {
+                    this.playerLevel = newLevel;
+                    this.updateLevelBadges();
+                }
+
+                this.updateDisplay();
+            }
+
+            // 不正解時の処理
+            onWrongAnswer() {
+                this.comboCount = 0;
+                this.updateDisplay();
+            }
+
+            // レベルバッジ更新
+            updateLevelBadges() {
+                const container = document.getElementById('levelBadges');
+                container.innerHTML = '';
+                
+                for (let i = 1; i <= this.playerLevel; i++) {
+                    const badge = document.createElement('span');
+                    badge.className = 'level-badge';
+                    badge.textContent = `Lv.${i}`;
+                    badge.onclick = () => {
+                        nekoponSound.playClick();
+                        badge.classList.add('organic-tap');
+                        setTimeout(() => badge.classList.remove('organic-tap'), 300);
+                        createParticle('🏆', '#FFD700', badge.getBoundingClientRect().left + 20, badge.getBoundingClientRect().top);
+                    };
+                    container.appendChild(badge);
+                }
+            }
+
+            // 表示更新
+            updateDisplay() {
+                document.getElementById('comboCount').textContent = this.comboCount;
+            }
+
+            // リセット
+            reset() {
+                this.comboCount = 0;
+                this.updateDisplay();
+            }
+        }
+
+        const gameification = new NekoponGameification();
+
+        /* ----------------- カテゴリー定義 ----------------- */
+        const categories = {
+            geography: [
+                {id: 'geo_world_overview', name: '1.世界の姿'},
+                {id: 'geo_japan_overview', name: '2.日本の姿'},
+                {id: 'geo_world_life', name: '3.世界各地の人々の生活と環境'},
+                {id: 'geo_asia', name: '4.世界の諸地域　アジア州'},
+                {id: 'geo_europe', name: '5.世界の諸地域　ヨーロッパ州'},
+                {id: 'geo_africa', name: '6.世界の諸地域　アフリカ州'},
+                {id: 'geo_north_america', name: '7.世界の諸地域　北アメリカ州'},
+                {id: 'geo_south_america', name: '8.世界の諸地域　南アメリカ州'},
+                {id: 'geo_oceania', name: '9.世界の諸地域　オセアニア'},
+                {id: 'geo_japan_features', name: '10.日本の地域的特色'},
+                {id: 'geo_japan_kyushu', name: '11.日本の諸地域　九州地方'},
+                {id: 'geo_japan_chugoku', name: '12.日本の諸地域　中国・四国地方'},
+                {id: 'geo_japan_kinki', name: '13.日本の諸地域　近畿地方'},
+                {id: 'geo_japan_chubu', name: '14.日本の諸地域　中部地方'},
+                {id: 'geo_japan_kanto', name: '15.日本の諸地域　関東地方'},
+                {id: 'geo_japan_tohoku', name: '16.日本の諸地域　東北地方'},
+                {id: 'geo_japan_hokkaido', name: '17.日本の諸地域　北海道地方'}
+            ],
+            history: [
+                {id: 'hist_ancient', name: '1.文明のおこりと日本の成り立ち'},
+                {id: 'hist_ancient_state', name: '2.古代国家の歩みと東アジア'},
+                {id: 'hist_kamakura', name: '3.武士のおこりと鎌倉幕府'},
+                {id: 'hist_muromachi', name: '4.モンゴルの襲来と室町幕府'},
+                {id: 'hist_unification', name: '5.ヨーロッパ人との出会いと全国統一'},
+                {id: 'hist_edo_early', name: '6.江戸幕府の成立と鎖国'},
+                {id: 'hist_edo_develop', name: '7.産業の発達と幕府政治の展開'},
+                {id: 'hist_opening', name: '8.欧米の進出と日本の開国'},
+                {id: 'hist_meiji', name: '9.明治維新'},
+                {id: 'hist_wars', name: '10.日清・日露戦争と日本の産業革命'},
+                {id: 'hist_wwi', name: '11.第一次世界大戦と日本'},
+                {id: 'hist_wwii', name: '12.世界恐慌と第二次世界大戦'},
+                {id: 'hist_postwar', name: '13.戦後の日本の発展と国際社会'}
+            ],
+            civics: [
+                {id: 'civics_modern', name: '1.現代社会と私たち'},
+                {id: 'civics_constitution', name: '2.人間の尊重と日本国憲法'},
+                {id: 'civics_democracy', name: '3.現代の民主政治'},
+                {id: 'civics_economy', name: '4.暮らしと経済'}
+            ],
+            chemistry: [
+                {id: 'chemistry_basic', name: '1.物質とその性質'},
+                {id: 'chemistry_gas', name: '2.気体の性質'},
+                {id: 'chemistry_solution', name: '3.水溶液の性質'},
+                {id: 'chemistry_state', name: '4.状態変化'},
+                {id: 'chemistry_change', name: '5.物質の変化'},
+                {id: 'chemistry_structure', name: '6.物質の成り立ち'},
+                {id: 'chemistry_reaction', name: '7.物質どうしの化学変化'},
+                {id: 'chemistry_mass', name: '8.化学変化と質量'},
+                {id: 'chemistry_ion', name: '9.イオンと電池'},
+                {id: 'chemistry_acid', name: '10.酸、アルカリ、塩'}
+            ],
+            biology: [
+                {id: 'biology_flower', name: '1.花のつくり'},
+                {id: 'biology_plant', name: '2.根・葉のつくり、植物の特徴と分類'},
+                {id: 'biology_animal', name: '3.動物の特徴と分類'},
+                {id: 'biology_microscope', name: '4.顕微鏡の使い方'},
+                {id: 'biology_cell', name: '5.生物と細胞'},
+                {id: 'biology_plant_body', name: '6.植物のからだのつくり、植物と日光'},
+                {id: 'biology_digestion', name: '7.消化と吸収'},
+                {id: 'biology_breathing', name: '8.呼吸'},
+                {id: 'biology_circulation', name: '9.血液の循環、排出のしくみ'},
+                {id: 'biology_response', name: '10.刺激と反応、動物のからだ'},
+                {id: 'biology_growth', name: '11.生物の成長と細胞の変化'},
+                {id: 'biology_reproduction', name: '12.生物の生殖'},
+                {id: 'biology_heredity', name: '13.遺伝の規則性と遺伝子'},
+                {id: 'biology_evolution', name: '14.生物の進化、生態系と食物連鎖'},
+                {id: 'biology_environment', name: '15.自然と環境、人間と自然環境'}
+            ],
+            physics: [
+                {id: 'physics_light', name: '1.光による現象'},
+                {id: 'physics_sound', name: '2.音による現象'},
+                {id: 'physics_force', name: '3.力による現象'},
+                {id: 'physics_current', name: '4.電流と電圧'},
+                {id: 'physics_energy', name: '5.電気エネルギー'},
+                {id: 'physics_magnetic', name: '6.電流と磁界'},
+                {id: 'physics_balance', name: '7.力のつり合いと合成・分解'},
+                {id: 'physics_motion', name: '8.物体の運動'},
+                {id: 'physics_pressure', name: '9.水圧と浮力'},
+                {id: 'physics_work', name: '10.エネルギーと仕事'},
+                {id: 'physics_energy_change', name: '11.エネルギーの移り変わり'},
+                {id: 'physics_resources', name: '12.エネルギー資源の利用'}
+            ],
+            earth: [
+                {id: 'earth_volcano', name: '1.火山'},
+                {id: 'earth_earthquake', name: '2.地震'},
+                {id: 'earth_strata', name: '3.地層のでき方'},
+                {id: 'earth_weather', name: '4.気象の観測、大気圧と圧力'},
+                {id: 'earth_front', name: '5.気団と前線、日本の天気'},
+                {id: 'earth_cloud', name: '6.雲のでき方と水蒸気'},
+                {id: 'earth_celestial', name: '7.地球の動きと天体の動き'},
+                {id: 'earth_solar', name: '8.太陽系の天体'},
+                {id: 'earth_moon', name: '9.月と惑星の見え方、自然の恵みと災害'}
+            ],
+            english_words: [
+                {id: 'words_time', name: '月・序数'},
+                {id: 'words_week', name: '曜日'},
+                {id: 'words_timeday', name: '時・時間帯など'},
+                {id: 'words_season', name: '季節・家族'},
+                {id: 'words_sports', name: 'スポーツ・教科'},
+                {id: 'words_job', name: '職業・人・建物・施設'},
+                {id: 'words_uncountable', name: '数えられない名詞'},
+                {id: 'words_verb_important', name: '入試必出重要動詞'},
+                {id: 'words_verb_various', name: 'いろいろな意味をもつ動詞'},
+                {id: 'words_verb_set', name: 'セットで覚えておきたい動詞'},
+                {id: 'words_verb_other', name: 'その他の重要動詞'},
+                {id: 'words_adj_quantity', name: '数・量を表す形容詞'},
+                {id: 'words_adj_various', name: 'いろいろな形容詞'},
+                {id: 'words_adj_adv', name: 'その他の重要形容詞・副詞'},
+                {id: 'words_adv_manner', name: '様子を表す副詞'}
+            ],
+            english_phrases: [
+                {id: 'phrases_verb', name: 'よく出る動詞の熟語'},
+                {id: 'phrases_set', name: 'セットで覚えておきたい熟語'},
+                {id: 'phrases_similar', name: '意味の似ている熟語'},
+                {id: 'phrases_verb_other', name: 'その他の動詞の熟語'},
+                {id: 'phrases_be', name: 'be 動詞を使った熟語'},
+                {id: 'phrases_quantity', name: '数や量を表す熟語'},
+                {id: 'phrases_time_place', name: '時・場所を表す熟語'},
+                {id: 'phrases_important', name: 'その他の重要熟語'}
+            ],
+            english_grammar: [
+                {id: 'grammar_irregular_past', name: '不規則動詞 - 過去形・過去分詞'},
+                {id: 'grammar_irregular_same', name: '不規則動詞 - 過去形と過去分詞が同じ'},
+                {id: 'grammar_irregular_special', name: '不規則動詞 - 特殊なケース'},
+                {id: 'grammar_be_past', name: 'be 動詞 - 過去形・過去分詞'},
+                {id: 'grammar_regular', name: '規則動詞 - 過去形・過去分詞'},
+                {id: 'grammar_third_person', name: '三人称単数現在形'},
+                {id: 'grammar_ing', name: '動詞の -ing 形'},
+                {id: 'grammar_comparative', name: '形容詞 - 比較級・最上級'},
+                {id: 'grammar_more_most', name: 'more、most をつける形容詞'},
+                {id: 'grammar_noun_plural', name: '名詞の複数形'},
+                {id: 'grammar_irregular_plural', name: '不規則な複数形'},
+                {id: 'grammar_pronoun', name: '人称代名詞'}
+            ]
+        };
+
+        /* ----------------- ゲーム変数 ----------------- */
+        let selectedCategories = [];
+        let currentQuestionIndex = 0;
+        let correctCount = 0;
+        let wrongCount = 0;
+        let totalCount = 0;
+        let usedQuestions = [];
+        let particleOffset = 0;
+        let currentSubject = '';
+        let questionMode = 'random';
+        let sequentialIndex = 0;
+
+        /* ----------------- エフェクト関数（簡素版） ----------------- */
+        function createParticle(text, color, x, y) {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            particle.textContent = text;
+            particle.style.color = color;
+            particle.style.left = (x + particleOffset) + 'px';
+            particle.style.top = (y + particleOffset) + 'px';
+            document.body.appendChild(particle);
+
+            particleOffset += 20;
+            if (particleOffset > 80) particleOffset = 0;
+
+            setTimeout(() => {
+                if (particle.parentNode) {
+                    particle.parentNode.removeChild(particle);
+                }
+            }, 1500);
+        }
+
+        function showNotification(text) {
+            const notification = document.getElementById('notification');
+            const notificationText = document.getElementById('notificationText');
+            notificationText.textContent = text;
+            notification.classList.add('show');
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        /* ----------------- 画面遷移関数 ----------------- */
+        function hideAllModals() {
+            document.querySelectorAll('.modal').forEach(modal => {
+                modal.classList.remove('show');
+            });
+        }
+
+        function goBackToMain() {
+            hideAllModals();
+            document.getElementById('mainSubjectModal').classList.add('show');
+            nekoponSound.playClick();
+        }
+
+        function goBackToSocial() {
+            hideAllModals();
+            document.getElementById('socialModal').classList.add('show');
+            nekoponSound.playClick();
+        }
+
+        function goBackToScience() {
+            hideAllModals();
+            document.getElementById('scienceModal').classList.add('show');
+            nekoponSound.playClick();
+        }
+
+        function goBackToEnglish() {
+            hideAllModals();
+            document.getElementById('englishModal').classList.add('show');
+            nekoponSound.playClick();
+        }
+
+        /* ----------------- 生き物らしいタップエフェクト追加関数 ----------------- */
+        function addOrganicTapEffect(element, soundType = 'click') {
+            // 重複したイベントリスナーを防ぐ
+            if (element.hasOrganicEffect) return;
+            element.hasOrganicEffect = true;
+
+            element.addEventListener('click', function(e) {
+                // 音の種類に応じて適切な音を再生
+                switch(soundType) {
+                    case 'subject':
+                        nekoponSound.playSubjectTap();
+                        break;
+                    case 'category':
+                        nekoponSound.playCategoryTap();
+                        break;
+                    default:
+                        nekoponSound.playClick();
+                }
+                
+                // 生き物らしいアニメーション
+                this.classList.add('organic-tap');
+                
+                // アニメーション終了後にクラス削除
+                setTimeout(() => {
+                    this.classList.remove('organic-tap');
+                }, soundType === 'subject' ? 500 : (soundType === 'category' ? 300 : 200));
+            });
+        }
+
+        /* ----------------- カテゴリー選択の初期化 ----------------- */
+        function initCategorySelection() {
+            // 地理カテゴリー
+            const geographyContainer = document.getElementById('geographyCategories');
+            categories.geography.forEach(category => {
+                const btn = document.createElement('button');
+                btn.className = 'category-btn';
+                btn.innerHTML = category.name;
+                btn.dataset.categoryId = category.id;
+                btn.onclick = () => toggleCategorySelection('geography', category.id, btn);
+                addOrganicTapEffect(btn, 'category');
+                geographyContainer.appendChild(btn);
+            });
+
+            // 歴史カテゴリー
+            const historyContainer = document.getElementById('historyCategories');
+            categories.history.forEach(category => {
+                const btn = document.createElement('button');
+                btn.className = 'category-btn';
+                btn.innerHTML = category.name;
+                btn.dataset.categoryId = category.id;
+                btn.onclick = () => toggleCategorySelection('history', category.id, btn);
+                addOrganicTapEffect(btn, 'category');
+                historyContainer.appendChild(btn);
+            });
+
+            // 公民カテゴリー
+            const civicsContainer = document.getElementById('civicsCategories');
+            categories.civics.forEach(category => {
+                const btn = document.createElement('button');
+                btn.className = 'category-btn';
+                btn.innerHTML = category.name;
+                btn.dataset.categoryId = category.id;
+                btn.onclick = () => toggleCategorySelection('civics', category.id, btn);
+                addOrganicTapEffect(btn, 'category');
+                civicsContainer.appendChild(btn);
+            });
+
+            // 化学カテゴリー
+            const chemistryContainer = document.getElementById('chemistryCategories');
+            categories.chemistry.forEach(category => {
+                const btn = document.createElement('button');
+                btn.className = 'category-btn';
+                btn.innerHTML = category.name;
+                btn.dataset.categoryId = category.id;
+                btn.onclick = () => toggleCategorySelection('chemistry', category.id, btn);
+                addOrganicTapEffect(btn, 'category');
+                chemistryContainer.appendChild(btn);
+            });
+
+            // 生物カテゴリー
+            const biologyContainer = document.getElementById('biologyCategories');
+            categories.biology.forEach(category => {
+                const btn = document.createElement('button');
+                btn.className = 'category-btn';
+                btn.innerHTML = category.name;
+                btn.dataset.categoryId = category.id;
+                btn.onclick = () => toggleCategorySelection('biology', category.id, btn);
+                addOrganicTapEffect(btn, 'category');
+                biologyContainer.appendChild(btn);
+            });
+
+            // 物理カテゴリー
+            const physicsContainer = document.getElementById('physicsCategories');
+            categories.physics.forEach(category => {
+                const btn = document.createElement('button');
+                btn.className = 'category-btn';
+                btn.innerHTML = category.name;
+                btn.dataset.categoryId = category.id;
+                btn.onclick = () => toggleCategorySelection('physics', category.id, btn);
+                addOrganicTapEffect(btn, 'category');
+                physicsContainer.appendChild(btn);
+            });
+
+            // 地学カテゴリー
+            const earthContainer = document.getElementById('earthCategories');
+            categories.earth.forEach(category => {
+                const btn = document.createElement('button');
+                btn.className = 'category-btn';
+                btn.innerHTML = category.name;
+                btn.dataset.categoryId = category.id;
+                btn.onclick = () => toggleCategorySelection('earth', category.id, btn);
+                addOrganicTapEffect(btn, 'category');
+                earthContainer.appendChild(btn);
+            });
+
+            // 英単語カテゴリー
+            const englishWordsContainer = document.getElementById('englishWordsCategories');
+            categories.english_words.forEach(category => {
+                const btn = document.createElement('button');
+                btn.className = 'category-btn';
+                btn.innerHTML = category.name;
+                btn.dataset.categoryId = category.id;
+                btn.onclick = () => toggleCategorySelection('english_words', category.id, btn);
+                addOrganicTapEffect(btn, 'category');
+                englishWordsContainer.appendChild(btn);
+            });
+
+            // 英熟語カテゴリー
+            const englishPhrasesContainer = document.getElementById('englishPhrasesCategories');
+            categories.english_phrases.forEach(category => {
+                const btn = document.createElement('button');
+                btn.className = 'category-btn';
+                btn.innerHTML = category.name;
+                btn.dataset.categoryId = category.id;
+                btn.onclick = () => toggleCategorySelection('english_phrases', category.id, btn);
+                addOrganicTapEffect(btn, 'category');
+                englishPhrasesContainer.appendChild(btn);
+            });
+
+            // 語形変化カテゴリー
+            const englishGrammarContainer = document.getElementById('englishGrammarCategories');
+            categories.english_grammar.forEach(category => {
+                const btn = document.createElement('button');
+                btn.className = 'category-btn';
+                btn.innerHTML = category.name;
+                btn.dataset.categoryId = category.id;
+                btn.onclick = () => toggleCategorySelection('english_grammar', category.id, btn);
+                addOrganicTapEffect(btn, 'category');
+                englishGrammarContainer.appendChild(btn);
+            });
+        }
+
+        function toggleCategorySelection(subject, categoryId, buttonElement) {
+            if (selectedCategories.includes(categoryId)) {
+                selectedCategories = selectedCategories.filter(id => id !== categoryId);
+                buttonElement.classList.remove('active');
+            } else {
+                selectedCategories.push(categoryId);
+                buttonElement.classList.add('active');
+            }
+
+            // クイズ開始ボタンの状態を更新
+            const camelCase = subject.split('_')
+                .map((word, index) => index === 0 ? word.charAt(0).toUpperCase() + word.slice(1) : word.charAt(0).toUpperCase() + word.slice(1))
+                .join('');
+            const startButton = document.getElementById(`start${camelCase}Quiz`);
+
+            if (startButton) {
+                startButton.disabled = selectedCategories.length === 0;
+            }
+        }
+
+        function startSelectedQuiz(subject, subjectName) {
+            currentSubject = subject;
+            hideAllModals();
+            document.getElementById('currentCategory').textContent = `${subjectName} - ${selectedCategories.length}単元選択`;
+            document.getElementById('gameScreen').classList.remove('hidden');
+            
+            const floatingBtn = document.getElementById('changeSubject');
+            floatingBtn.classList.remove('hidden');
+            floatingBtn.style.display = 'flex';
+
+            // 統計をリセット
+            correctCount = 0;
+            wrongCount = 0;
+            totalCount = 0;
+            usedQuestions = [];
+            sequentialIndex = 0;
+            gameification.reset();
+            updateStats();
+            showNotification(`${subjectName}の${selectedCategories.length}単元を選択しました`);
+        }
+
+        function updateStats() {
+            document.getElementById('correctCount').textContent = correctCount;
+            document.getElementById('wrongCount').textContent = wrongCount;
+            document.getElementById('totalCount').textContent = totalCount;
+        }
+
+        function setQuestionMode(mode) {
+            questionMode = mode;
+            
+            document.getElementById('randomModeBtn').classList.remove('active');
+            document.getElementById('sequentialModeBtn').classList.remove('active');
+            
+            if (mode === 'random') {
+                document.getElementById('randomModeBtn').classList.add('active');
+                document.getElementById('modeDescription').textContent = '問題をランダムに出題します';
+                usedQuestions = [];
+                showNotification('ランダム出題に切り替えました');
+            } else {
+                document.getElementById('sequentialModeBtn').classList.add('active');
+                document.getElementById('modeDescription').textContent = '問題を順番通りに出題します';
+                sequentialIndex = 0;
+                showNotification('順番通り出題に切り替えました');
+            }
+        }
+
+        /* ----------------- クイズ機能 ----------------- */
+        function openQuiz() {
+            if (selectedCategories.length === 0) {
+                showNotification('単元を選択してください');
+                return;
+            }
+
+            let allProblems = [];
+            selectedCategories.forEach(categoryId => {
+                if (problemDatabase[categoryId]) {
+                    allProblems = allProblems.concat(problemDatabase[categoryId]);
+                }
+            });
+
+            if (allProblems.length === 0) {
+                showNotification('選択された単元の問題はまだ準備中です');
+                return;
+            }
+
+            if (usedQuestions.length >= allProblems.length) {
+                usedQuestions = [];
+                showNotification('全問クリア！問題をリセットしました');
+            }
+
+            let quiz;
+            let remainingCount;
+            
+            if (questionMode === 'random') {
+                const availableQuestions = allProblems.filter((_, index) => !usedQuestions.includes(index));
+                if (availableQuestions.length === 0) return;
+                
+                const randomIndex = Math.floor(Math.random() * availableQuestions.length);
+                quiz = availableQuestions[randomIndex];
+                const originalIndex = allProblems.indexOf(quiz);
+                usedQuestions.push(originalIndex);
+                remainingCount = allProblems.length - usedQuestions.length;
+            } else {
+                if (sequentialIndex >= allProblems.length) {
+                    sequentialIndex = 0;
+                    showNotification('全問題を一周しました！最初から再開します');
+                }
+                quiz = allProblems[sequentialIndex];
+                sequentialIndex++;
+                remainingCount = allProblems.length - sequentialIndex;
+                if (remainingCount < 0) remainingCount = 0;
+            }
+
+            const modal = document.getElementById('quizModal');
+            const qEl = document.getElementById('quizQ');
+            const optDiv = document.getElementById('quizOptions');
+            const msgEl = document.getElementById('quizMsg');
+            const explanationEl = document.getElementById('quizExplanation');
+            const nextBtn = document.getElementById('quizNext');
+            const backBtn = document.getElementById('quizBack');
+
+            qEl.textContent = `${quiz.q} (残り${remainingCount}問)`;
+            optDiv.innerHTML = '';
+            msgEl.textContent = '';
+            explanationEl.classList.remove('has-content');
+
+            if (isEnglishCategory()) {
+                speakWord(quiz.q);
+            }
+
+            nextBtn.disabled = true;
+            nextBtn.style.opacity = '0.3';
+            backBtn.disabled = true;
+            backBtn.style.opacity = '0.3';
+
+            let firstAnswer = false;
+
+            quiz.opts.forEach((txt, i) => {
+                const btn = document.createElement('button');
+                btn.innerHTML = `<span>${txt}</span>`;
+                btn.className = 'quiz-option w-full';
+                
+                // 生き物らしいエフェクト追加
+                addOrganicTapEffect(btn);
+                
+                btn.onclick = () => {
+                    if (isEnglishCategory()) {
+                        speakWord(txt);
+                    }
+                    
+                    if (!firstAnswer) {
+                        firstAnswer = true;
+                        totalCount++;
+                        
+                        if (i === quiz.ans) {
+                            correctCount++;
+                            gameification.onCorrectAnswer();
+                            nekoponSound.playCorrect();
+                            showNotification('正解です！');
+                            createParticle('✓', '#10b981', window.innerWidth / 2, window.innerHeight / 2);
+                            
+                            // バイブレーション
+                            if ('vibrate' in navigator) {
+                                navigator.vibrate([50, 25, 50]);
+                            }
+                        } else {
+                            wrongCount++;
+                            gameification.onWrongAnswer();
+                            nekoponSound.playWrong();
+                            
+                            // バイブレーション
+                            if ('vibrate' in navigator) {
+                                navigator.vibrate([100]);
+                            }
+                        }
+                        updateStats();
+                        
+                        nextBtn.disabled = false;
+                        nextBtn.style.opacity = '1';
+                        backBtn.disabled = false;
+                        backBtn.style.opacity = '1';
+                    }
+                    
+                    if (i === quiz.ans) {
+                        msgEl.innerHTML = `正解です！${quiz.exp || ''}`;
+                        msgEl.style.color = '#10b981';
+                    } else {
+                        msgEl.innerHTML = `不正解です。正解は「${quiz.opts[quiz.ans]}」でした。${quiz.exp || ''}`;
+                        msgEl.style.color = '#ef4444';
+                    }
+                    explanationEl.classList.add('has-content');
+                };
+                optDiv.appendChild(btn);
+            });
+
+            nextBtn.onclick = () => {
+                nekoponSound.playClick();
+                loadNextQuiz();
+            };
+
+            backBtn.onclick = () => {
+                nekoponSound.playClick();
+                modal.classList.remove('show');
+                showNotification('お疲れ様でした');
+            };
+
+            modal.classList.add('show');
+        }
+
+        function loadNextQuiz() {
+            let allProblems = [];
+            selectedCategories.forEach(categoryId => {
+                if (problemDatabase[categoryId]) {
+                    allProblems = allProblems.concat(problemDatabase[categoryId]);
+                }
+            });
+
+            if (allProblems.length === 0) return;
+
+            if (usedQuestions.length >= allProblems.length && questionMode === 'random') {
+                usedQuestions = [];
+                showNotification('全問クリア！問題をリセットしました');
+            }
+
+            let quiz;
+            let remainingCount;
+            
+            if (questionMode === 'random') {
+                const availableQuestions = allProblems.filter((_, index) => !usedQuestions.includes(index));
+                if (availableQuestions.length === 0) return;
+                
+                const randomIndex = Math.floor(Math.random() * availableQuestions.length);
+                quiz = availableQuestions[randomIndex];
+                const originalIndex = allProblems.indexOf(quiz);
+                usedQuestions.push(originalIndex);
+                remainingCount = allProblems.length - usedQuestions.length;
+            } else {
+                if (sequentialIndex >= allProblems.length) {
+                    sequentialIndex = 0;
+                    showNotification('全問題を一周しました！最初から再開します');
+                }
+                quiz = allProblems[sequentialIndex];
+                sequentialIndex++;
+                remainingCount = allProblems.length - sequentialIndex;
+                if (remainingCount < 0) remainingCount = 0;
+            }
+
+            const qEl = document.getElementById('quizQ');
+            const optDiv = document.getElementById('quizOptions');
+            const msgEl = document.getElementById('quizMsg');
+            const explanationEl = document.getElementById('quizExplanation');
+            const nextBtn = document.getElementById('quizNext');
+            const backBtn = document.getElementById('quizBack');
+
+            qEl.textContent = `${quiz.q} (残り${remainingCount}問)`;
+            optDiv.innerHTML = '';
+            msgEl.textContent = '';
+            explanationEl.classList.remove('has-content');
+
+            if (isEnglishCategory()) {
+                speakWord(quiz.q);
+            }
+
+            nextBtn.disabled = true;
+            nextBtn.style.opacity = '0.3';
+            backBtn.disabled = true;
+            backBtn.style.opacity = '0.3';
+
+            let firstAnswer = false;
+
+            quiz.opts.forEach((txt, i) => {
+                const btn = document.createElement('button');
+                btn.innerHTML = `<span>${txt}</span>`;
+                btn.className = 'quiz-option w-full';
+                
+                // 生き物らしいエフェクト追加
+                addOrganicTapEffect(btn);
+                
+                btn.onclick = () => {
+                    if (isEnglishCategory()) {
+                        speakWord(txt);
+                    }
+                    
+                    if (!firstAnswer) {
+                        firstAnswer = true;
+                        totalCount++;
+                        
+                        if (i === quiz.ans) {
+                            correctCount++;
+                            gameification.onCorrectAnswer();
+                            nekoponSound.playCorrect();
+                            showNotification('正解です！');
+                            createParticle('✓', '#10b981', window.innerWidth / 2, window.innerHeight / 2);
+                            
+                            if ('vibrate' in navigator) {
+                                navigator.vibrate([50, 25, 50]);
+                            }
+                        } else {
+                            wrongCount++;
+                            gameification.onWrongAnswer();
+                            nekoponSound.playWrong();
+                            
+                            if ('vibrate' in navigator) {
+                                navigator.vibrate([100]);
+                            }
+                        }
+                        updateStats();
+                        
+                        nextBtn.disabled = false;
+                        nextBtn.style.opacity = '1';
+                        backBtn.disabled = false;
+                        backBtn.style.opacity = '1';
+                    }
+                    
+                    if (i === quiz.ans) {
+                        msgEl.innerHTML = `正解です！${quiz.exp || ''}`;
+                        msgEl.style.color = '#10b981';
+                    } else {
+                        msgEl.innerHTML = `不正解です。正解は「${quiz.opts[quiz.ans]}」でした。${quiz.exp || ''}`;
+                        msgEl.style.color = '#ef4444';
+                    }
+                    explanationEl.classList.add('has-content');
+                };
+                optDiv.appendChild(btn);
+            });
+        }
+
+        /* ----------------- イベントリスナー ----------------- */
+        function initEventListeners() {
+            // タイトル要素のタップ
+            document.getElementById('mainTitle').addEventListener('click', (e) => {
+                e.stopPropagation();
+                nekoponSound.playTitleBounce();
+                document.getElementById('mainTitle').classList.add('title-bounce');
+                
+                setTimeout(() => {
+                    document.getElementById('mainTitle').classList.remove('title-bounce');
+                }, 600);
+            });
+
+            // 猫アイコンタップ
+            document.getElementById('leftCat').addEventListener('click', (e) => {
+                e.stopPropagation();
+                nekoponSound.playCatBounce();
+                document.getElementById('leftCat').classList.add('bounce');
+                
+                setTimeout(() => {
+                    document.getElementById('leftCat').classList.remove('bounce');
+                }, 500);
+            });
+
+            document.getElementById('rightCat').addEventListener('click', (e) => {
+                e.stopPropagation();
+                nekoponSound.playCatBounce();
+                document.getElementById('rightCat').classList.add('bounce');
+                
+                setTimeout(() => {
+                    document.getElementById('rightCat').classList.remove('bounce');
+                }, 500);
+            });
+
+            // スコア項目タップ
+            document.getElementById('correctCount').addEventListener('click', (e) => {
+                e.stopPropagation();
+                nekoponSound.playClick();
+                createParticle('✓', '#10b981', e.clientX, e.clientY);
+            });
+
+            document.getElementById('wrongCount').addEventListener('click', (e) => {
+                e.stopPropagation();
+                nekoponSound.playClick();
+                createParticle('✗', '#ef4444', e.clientX, e.clientY);
+            });
+
+            document.getElementById('totalCount').addEventListener('click', (e) => {
+                e.stopPropagation();
+                nekoponSound.playClick();
+                createParticle('📊', '#8b4513', e.clientX, e.clientY);
+            });
+
+            document.getElementById('comboCount').addEventListener('click', (e) => {
+                e.stopPropagation();
+                nekoponSound.playClick();
+                createParticle('🔥', '#ff7f50', e.clientX, e.clientY);
+            });
+
+            // メイン教科選択
+            document.querySelectorAll('[data-subject]').forEach(btn => {
+                addOrganicTapEffect(btn, 'subject');
+                btn.addEventListener('click', (e) => {
+                    const subject = e.currentTarget.dataset.subject;
+                    hideAllModals();
+                    document.getElementById(subject + 'Modal').classList.add('show');
+                });
+            });
+
+            // 詳細カテゴリ選択
+            document.querySelectorAll('[data-category]').forEach(btn => {
+                addOrganicTapEffect(btn, 'subject');
+                btn.addEventListener('click', (e) => {
+                    const category = e.currentTarget.dataset.category;
+                    selectedCategories = [];
+                    hideAllModals();
+                    
+                    const modalId = category.split('_')
+                        .map((word, index) => index === 0 ? word : word.charAt(0).toUpperCase() + word.slice(1))
+                        .join('');
+                    
+                    document.getElementById(modalId + 'Modal').classList.add('show');
+                });
+            });
+
+            // クイズ開始ボタン群
+            const startButtons = [
+                'startGeographyQuiz', 'startHistoryQuiz', 'startCivicsQuiz',
+                'startChemistryQuiz', 'startBiologyQuiz', 'startPhysicsQuiz', 'startEarthQuiz',
+                'startEnglishWordsQuiz', 'startEnglishPhrasesQuiz', 'startEnglishGrammarQuiz'
+            ];
+
+            const subjectNames = [
+                '🗺️ 地理', '🏛️ 歴史', '⚖️ 公民',
+                '🧪 化学', '🧬 生物', '⚛️ 物理', '🌍 地学',
+                '📝 英単語', '💬 英熟語', '📘 語形変化'
+            ];
+
+            startButtons.forEach((buttonId, index) => {
+                const btn = document.getElementById(buttonId);
+                if (btn) {
+                    addOrganicTapEffect(btn);
+                    btn.addEventListener('click', () => {
+                        nekoponSound.playClick();
+                        startSelectedQuiz(buttonId.replace('start', '').replace('Quiz', '').toLowerCase(), subjectNames[index]);
+                    });
+                }
+            });
+
+            // メインクイズスタートボタン
+            const mainStartBtn = document.getElementById('startQuizButton');
+            addOrganicTapEffect(mainStartBtn);
+            mainStartBtn.addEventListener('click', () => {
+                nekoponSound.playClick();
+                openQuiz();
+            });
+
+            // 出題形式切り替えボタン
+            const randomBtn = document.getElementById('randomModeBtn');
+            const sequentialBtn = document.getElementById('sequentialModeBtn');
+            
+            addOrganicTapEffect(randomBtn, 'category');
+            addOrganicTapEffect(sequentialBtn, 'category');
+            
+            randomBtn.addEventListener('click', () => {
+                setQuestionMode('random');
+            });
+            
+            sequentialBtn.addEventListener('click', () => {
+                setQuestionMode('sequential');
+            });
+
+            // 教科変更ボタン
+            const changeBtn = document.getElementById('changeSubject');
+            addOrganicTapEffect(changeBtn);
+            changeBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                selectedCategories = [];
+                sequentialIndex = 0;
+                usedQuestions = [];
+                gameification.reset();
+                document.getElementById('gameScreen').classList.add('hidden');
+                document.getElementById('changeSubject').classList.add('hidden');
+                goBackToMain();
+                showNotification('教科選択に戻りました');
+            });
+
+            // 戻るボタンたち
+            document.querySelectorAll('.back-button').forEach(btn => {
+                addOrganicTapEffect(btn, 'category');
+            });
+
+            // クリーンボタンたち
+            document.querySelectorAll('.clean-button').forEach(btn => {
+                addOrganicTapEffect(btn);
+            });
+        }
+
+        /* ----------------- 学習データの保存・読み込み（簡素版） ----------------- */
+        class NekoponProgress {
+            constructor() {
+                this.storageKey = 'nekopon-quiz-progress';
+                this.loadProgress();
+            }
+
+            saveProgress() {
+                const progressData = {
+                    totalQuestions: totalCount,
+                    correctAnswers: correctCount,
+                    wrongAnswers: wrongCount,
+                    playerLevel: gameification.playerLevel,
+                    totalExperience: gameification.totalExperience,
+                    maxCombo: gameification.maxCombo,
+                    lastPlayed: new Date().toISOString()
+                };
+
+                try {
+                    localStorage.setItem(this.storageKey, JSON.stringify(progressData));
+                } catch (e) {
+                    console.log('Progress save failed:', e);
+                }
+            }
+
+            loadProgress() {
+                try {
+                    const saved = localStorage.getItem(this.storageKey);
+                    if (saved) {
+                        const progressData = JSON.parse(saved);
+                        
+                        // ゲーミフィケーション データの復元
+                        gameification.playerLevel = progressData.playerLevel || 1;
+                        gameification.totalExperience = progressData.totalExperience || 0;
+                        gameification.maxCombo = progressData.maxCombo || 0;
+                        
+                        // レベルバッジの更新
+                        gameification.updateLevelBadges();
+                        
+                        // 復帰メッセージ
+                        if (progressData.lastPlayed) {
+                            const daysSinceLastPlay = Math.floor(
+                                (new Date() - new Date(progressData.lastPlayed)) / (1000 * 60 * 60 * 24)
+                            );
+                            
+                            if (daysSinceLastPlay === 0) {
+                                showNotification('おかえりなさい！今日も頑張りましょう');
+                            } else if (daysSinceLastPlay === 1) {
+                                showNotification('昨日ぶりですね！');
+                            } else if (daysSinceLastPlay > 1) {
+                                showNotification(`${daysSinceLastPlay}日ぶりですね！`);
+                            }
+                        }
+                    }
+                } catch (e) {
+                    console.log('Progress load failed:', e);
+                }
+            }
+
+            // 定期保存
+            startAutoSave() {
+                setInterval(() => {
+                    this.saveProgress();
+                }, 30000); // 30秒ごとに自動保存
+            }
+        }
+
+        const progressManager = new NekoponProgress();
+
+        /* ----------------- 初期化とメイン処理 ----------------- */
+        document.addEventListener('DOMContentLoaded', () => {
+            // カテゴリー選択の初期化
+            initCategorySelection();
+            
+            // イベントリスナーの初期化
+            initEventListeners();
+            
+            // 自動保存開始
+            progressManager.startAutoSave();
+            
+            // フローティングボタンの初期状態
+            document.getElementById('changeSubject').classList.add('hidden');
+
+            // 音声システムの初期化（ユーザーインタラクション後）
+            document.addEventListener('click', () => {
+                if (nekoponSound.audioContext && nekoponSound.audioContext.state === 'suspended') {
+                    nekoponSound.audioContext.resume();
+                }
+            }, { once: true });
+
+            // 音声合成の初期化
+            if ('speechSynthesis' in window && typeof speechSynthesis.getVoices === 'function') {
+                const voicePolling = setInterval(() => {
+                    if (speechSynthesis.getVoices().length) {
+                        clearInterval(voicePolling);
+                    } else {
+                        speechSynthesis.getVoices(); 
+                    }
+                }, 200);
+            }
+
+            // ページ離脱時の保存
+            window.addEventListener('beforeunload', () => {
+                progressManager.saveProgress();
+            });
+
+            // スクロール問題修正：モーダルのスクロール設定を詳細に
+            document.querySelectorAll('.modal').forEach(modal => {
+                modal.style.overflowY = 'auto';
+                modal.style.webkitOverflowScrolling = 'touch';
+                
+                // スクロール時のパフォーマンス向上
+                modal.addEventListener('scroll', (e) => {
+                    e.stopPropagation();
+                }, { passive: true });
+            });
+
+            // 初期レベルバッジ表示
+            gameification.updateLevelBadges();
+
+            // スクロール関連の追加修正
+            setTimeout(() => {
+                // iOS Safariでのスクロール問題対策
+                document.querySelectorAll('.modal .grid').forEach(grid => {
+                    grid.style.webkitOverflowScrolling = 'touch';
+                    grid.style.overflowY = 'auto';
+                    grid.style.maxHeight = '60vh';
+                    
+                    // スクロールバーのスタイリング
+                    if (window.innerWidth > 640) {
+                        grid.style.paddingRight = '8px';
+                    }
+                });
+
+                // モーダル外をタップしたときの閉じる機能
+                document.querySelectorAll('.modal').forEach(modal => {
+                    modal.addEventListener('click', (e) => {
+                        if (e.target === modal) {
+                            // メイン教科選択以外のモーダルを閉じる
+                            if (modal.id !== 'mainSubjectModal') {
+                                nekoponSound.playClick();
+                                modal.classList.remove('show');
+                            }
+                        }
+                    });
+                });
+            }, 100);
+
+            // 初回のウェルカムメッセージ
+            setTimeout(() => {
+                if (!localStorage.getItem('nekopon-first-visit')) {
+                    showNotification('NEKOPON Quizへようこそ！学習を始めましょう');
+                    localStorage.setItem('nekopon-first-visit', 'true');
+                }
+            }, 1000);
+        });
+
+        /* ----------------- エラーハンドリング強化 ----------------- */
+        window.addEventListener('error', (e) => {
+            console.error('NEKOPON Quiz Error:', e.error);
+            showNotification('エラーが発生しました。リロードしてください');
+        });
+
+        window.addEventListener('unhandledrejection', (e) => {
+            console.error('Unhandled Promise Rejection:', e.reason);
+            showNotification('通信エラーが発生しました');
+        });
+
+        // グローバルアクセス用（デバッグ用）
+        window.nekoponGame = gameification;
+        window.nekoponSound = nekoponSound;
+        window.nekoponProgress = progressManager;
+    </script>
+</body>
+</html>
